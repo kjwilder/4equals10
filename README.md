@@ -15,7 +15,7 @@ Solve 4=10 puzzles
   - The number of reorderings (permutations) of four digits is bounded by and
     on the order of `10^4 = 10,000`.
   - The number of ways to choose three arithmetic operators is `4^3 = 64`.
-  - Their are at most five meaningful ways to add a single pair of parentheses
+  - There are at most five meaningful ways to add a single pair of parentheses
     to an equation with four digits and three arithmetic operators.
   - Putting the above points together, there are no more than about 3 million
     equations that python would need to eval in order to determine a solution
