@@ -35,7 +35,7 @@ Solve 4=10 puzzles
   the equation should equal 20.
 - `python solver.py -e 4 -nd 3` - Prints solutions for all three-digit
   sequences when the equation should equal 4.
-- `python solver -d 123456 -e 25` - Finds a solution, if it exists, for the six
+- `python solver.py -d 123456 -e 25` - Finds a solution, if it exists, for the six
   digits 123456 that equals 25, e.g., `1 * 2 + 3 * 4 + 5 + 6`.
 
 ## Some details
