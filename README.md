@@ -39,7 +39,7 @@ Solve 4=10 puzzles
   digits 123456 that equals 25, e.g., `1 * 2 + 3 * 4 + 5 + 6`.
 
 ## Some details
-- A "simple" solution without parentheses and reordering will be shown, if it exists,
+- A "simple" solution without parentheses and reordering will be shown, if it exists.
 - If no simple solution exists, the program will attempt, in order, to find:
   - a solution with parentheses.
   - a solution with reordering and no parentheses.
