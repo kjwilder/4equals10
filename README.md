@@ -3,28 +3,28 @@ Solve 4=10 puzzles
 
 ## About
 
-- One night in January, 2023 I came across an Android game called `4=10` in
+- In January, 2023 I came across an Android game called `4=10` in
   which one is presented with four digits and has to use a combination of
   arithmetic operators (+, -, \*, /), parentheses (at most one pair), and
-  reordering of the digits to construct an equation equal to 10.
-- After playing the game a bit, I wondered if I could programatically solve
-  the problems:
+  reordering of the digits to construct an equation equal to 10. For
+  example, a solution for the four digits '0254' is '0 + (4 - 2) * 5'.
+- After playing the game a bit, I wondered if I could solve
+  the game with a python program:
   - I estimated the time it would take python to eval a string like `9 + ( 4 -
-    2 ) / 3` on my MacBook Pro is less than (and perhaps much less than) one
-    ten-millionth of a second.
+    2 ) / 3` on my MacBook Pro is less than (and perhaps much less than) `one
+    ten-millionth` of a second.
   - The number of reorderings (permutations) of four digits is bounded by and
     on the order of `10^4 = 10,000`.
   - The number of ways to choose three arithmetic operators is `4^3 = 64`.
-  - There are at most five meaningful ways to add a single pair of parentheses
+  - There are at most `5` meaningful ways to add a single pair of parentheses
     to an equation with four digits and three arithmetic operators.
   - Putting the above points together, there are no more than about 3 million
     equations that python would need to eval in order to determine a solution
     for any particular four digits. My take was a python program to solve any
     four digits would run in less that a second.
-  - Unable to sleep, I wrote the python program in this repo to solve
-    a `4=10` problem. My solution is brute force and does not attempt any
-    optimizations, but even so it ran fast enough that it could solve
-    every possible set of four digits in about 20 seconds.
+  - I wrote the code you see here. My solution is simple and does not attempt
+  - any optimizations, but even so it ran fast enough that it could solve
+    every sequence of four digits in about 20 seconds.
   - I was intrigued enough to spend additional time updating this program to
     handle any number of digits, any operators, and arbitrary sums.  It can be
     very slow when there are a lot of digits, especially for cases that have
