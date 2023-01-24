@@ -1,10 +1,8 @@
 import argparse
 import itertools
 
-OPERATORS = '+-*/'
 
-
-def test_eq(expected=10, *args):
+def test_eq(expected, *args):
     eq = ' '.join(str(arg) for arg in args)
     try:
         result = eval(eq)
@@ -28,12 +26,12 @@ def try_to_solve_with_parentheses(expected, *args):
     return None
 
 
-def try_to_solve(*args, expected):
+def try_to_solve(*args, expected=10, operators='+-/*'):
     nops = len(args) - 1
-    offsets = [4 ** i for i in range(nops - 1, -1, -1)]
+    offsets = [len(operators) ** i for i in range(nops - 1, -1, -1)]
     peq = None
-    for i in range(4 ** nops):
-        ops = [OPERATORS[i // offsets[j] % 4] for j in range(nops)]
+    for i in range(len(operators) ** nops):
+        ops = [operators[i // offsets[j] % len(operators)] for j in range(nops)]
         eq = test_eq(
             expected, *(x for t in zip(args, ops) for x in t), args[-1])
         if eq:
@@ -67,16 +65,16 @@ def update_solutions(solutions):
     return solutions
 
 
-def solve_one(digits, expected):
+def solve_one(digits, expected, operators):
     sq = 'No solution'
-    solution = try_to_solve(*digits, expected=expected)
+    solution = try_to_solve(expected=expected, operators=operators, *digits)
     if solution:
         sq = ': '.join(solution[::-1])
         print(f'{sq}')
         return
     psol = None
     for perm in itertools.permutations(digits):
-        solution = try_to_solve(*perm, expected=expected)
+        solution = try_to_solve(expected=expected, operators=operators, *perm)
         if solution:
             solution = list(solution)
             solution[1] = solution[1].replace('o', 'r')
@@ -88,11 +86,12 @@ def solve_one(digits, expected):
     print(f'{sq}')
 
 
-def main(num_digits, expected):
+def main(num_digits, expected, operators):
     solutions = {}
     for n in range(10 ** num_digits):
         values = tuple(f'{n:0>{num_digits}}')
-        solutions[values] = try_to_solve(*values, expected=expected)
+        solutions[values] = try_to_solve(
+                expected=expected, operators=operators, *values)
     solutions = update_solutions(solutions)
     for quad in sorted(solutions):
         sq = ''
@@ -120,12 +119,17 @@ def parse_args():
         type=int,
         default=10,
     )
+    parser.add_argument(
+        '-o',
+        '--operators',
+        default='+-*/',
+    )
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
     if args.digits:
-        solve_one(args.digits, args.expected)
+        solve_one(args.digits, args.expected, args.operators)
     else:
-        main(args.num_digits, args.expected)
+        main(args.num_digits, args.expected, args.operators)
