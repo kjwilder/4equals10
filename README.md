@@ -4,15 +4,22 @@ Solve 4=10 puzzles
 ## About
 
 - In January, 2023 I came across an Android game called `4=10` in
-  which one is presented with four digits and has to use a combination of
-  arithmetic operators (+, -, \*, /), parentheses (at most one pair), and
-  reordering of the digits to construct an equation equal to 10. For
-  example, a solution for the four digits '0254' is '0 + (4 - 2) * 5'.
-- After playing the game a bit, I wondered if I could solve
+  which one is presented with four digits and has to use a combination of:
+  - arithmetic operators +, -, \*, /
+  - parentheses (at most one pair)
+  - reordering of the digits
+  
+  to construct an equation equal to 10.
+
+  For example, a solution for the four digits `0254` is
+  ```
+  0 + (4 - 2) * 5
+  ```
+- After playing the game a bit, I decided to try to solve
   the game with a python program:
-  - I estimated the time it would take python to eval a string like `9 + ( 4 -
-    2 ) / 3` on my MacBook Pro is less than (and perhaps much less than) `one
-    ten-millionth` of a second.
+  - I estimated the time it would take python to `eval` a string like `9 + ( 4 -
+    2 ) / 3` on my MacBook Pro is less than (and perhaps much less than) one
+    ten-millionth of a second.
   - The number of reorderings (permutations) of four digits is bounded by and
     on the order of `10^4 = 10,000`.
   - The number of ways to choose three arithmetic operators is `4^3 = 64`.
@@ -25,7 +32,7 @@ Solve 4=10 puzzles
   - I wrote the code you see here. My solution is simple and does not attempt
     any optimizations, but even so it ran fast enough that it could solve
     every sequence of four digits in about 20 seconds.
-  - I was intrigued enough to spend additional time updating this program to
+  - I spent some additional time updating this program to
     handle any number of digits, any operators, and arbitrary sums.  It can be
     very slow when there are a lot of digits, especially for cases that have
     no solution.
