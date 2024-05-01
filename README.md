@@ -25,7 +25,7 @@ Solve 4=10 puzzles
   - I wrote the code you see here. My solution is simple and does not attempt
     any optimizations, but even so it ran fast enough that it could solve
     every sequence of four digits in about 20 seconds.
-  - I was intrigued enough to spend additional time updating this program to
+  - I spent some additional time updating this program to
     handle any number of digits, any operators, and arbitrary sums.  It can be
     very slow when there are a lot of digits, especially for cases that have
     no solution.
