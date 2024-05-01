@@ -8,11 +8,11 @@ Solve 4=10 puzzles
   arithmetic operators (+, -, \*, /), parentheses (at most one pair), and
   reordering of the digits to construct an equation equal to 10. For
   example, a solution for the four digits '0254' is '0 + (4 - 2) * 5'.
-- After playing the game a bit, I wondered if I could solve
-  the game with a python program:
-  - I estimated the time it would take python to eval a string like `9 + ( 4 -
-    2 ) / 3` on my MacBook Pro is less than (and perhaps much less than) `one
-    ten-millionth` of a second.
+- After playing the game a bit, I considered trying to solve the game with
+  a python program and did some back-of-the-envelope calculations.
+  - python should be able to eval a string like `9 + ( 4 - 2 ) / 3` on my
+    MacBook Pro in less than (and perhaps much less than) `one ten-millionth`
+    of a second.
   - The number of reorderings (permutations) of four digits is bounded by and
     on the order of `10^4 = 10,000`.
   - The number of ways to choose three arithmetic operators is `4^3 = 64`.
@@ -31,19 +31,20 @@ Solve 4=10 puzzles
     no solution.
 
 ## Usage examples
-- `python solver.py` - Prints solutions for all four-digit sequences.
-- `python solver.py -e 20` - Prints solutions for all four-digit sequences when
+- `fourten - Prints solutions for all four-digit sequences.
+- `fourten -e 20` - Prints solutions for all four-digit sequences when
   the equation should equal 20.
-- `python solver.py -e 4 -nd 3` - Prints solutions for all three-digit
+- `fourten -e 4 -nd 3` - Prints solutions for all three-digit
   sequences when the equation should equal 4.
-- `python solver.py -d 123456 -e 25` - Finds a solution, if it exists, for the six
+- `fourten -d 123456 -e 25` - Finds a solution, if it exists, for the six
   digits 123456 that equals 25, e.g., `1 * 2 + 3 * 4 + 5 + 6`.
-- `python solver.py -d 123456 -e 19 -o '+-'` - Find a solution for the six
+- `fourten -d 123456 -e 19 -o '+-'` - Find a solution for the six
   digits 123456 that equals 19 using only addition and subtraction.
 
 ## Some details
-- A "simple" solution without parentheses and reordering will be shown, if it exists.
+- A "simple" solution without parentheses and reordering will be shown and labeled `on`
+  if it exists.
 - If no simple solution exists, the program will attempt, in order, to find:
-  - a solution with parentheses.
-  - a solution with reordering and no parentheses.
-  - a solution with reordering and parentheses.
+  - a solution with parentheses (`op`).
+  - a solution with reordering and no parentheses (`rn`).
+  - a solution with reordering and parentheses (`rp`).
