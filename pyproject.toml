@@ -1,0 +1,18 @@
+[project]
+name = "fourten"
+version = "0.1.0"
+description = "Solve 4=10-style arithmetic puzzles from the command line"
+authors = [{name = "4equals10"}]
+requires-python = ">=3.11"
+readme = "README.md"
+
+[project.scripts]
+fourten = "fourten.cli:main"
+
+[build-system]
+requires = ["setuptools>=67"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
