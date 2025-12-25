@@ -8,13 +8,8 @@
 </head>
 <body>
   <main class="page">
-    <header class="page__header">
-      <h1>4equals10</h1>
-      <p>Solve digit puzzles with custom operators, targets, and rules.</p>
-    </header>
-
     <section class="card">
-      <h2>Setup</h2>
+      <h1 align=center>4=10</h1>
       <div class="layout">
         <div class="stack">
           <div class="grid">
@@ -30,6 +25,7 @@
               <input id="allowReorder" type="checkbox" checked />
               <span>Allow reordering</span>
             </label>
+            <label class="field">
             <label class="field field--checkbox">
               <input id="allowParentheses" type="checkbox" checked />
               <span>Allow parentheses</span>
@@ -46,10 +42,10 @@
         <div class="inputs-row">
           <label class="field">
             <span>Digits</span>
-            <input id="digitsInput" type="text" value="0254" inputmode="numeric" />
+            <input id="digitsInput" type="text" value="1234" inputmode="numeric" />
           </label>
           <label class="field">
-            <span>Your solution</span>
+            <span>Solution</span>
             <input id="userSolution" type="text" />
           </label>
         </div>
@@ -58,9 +54,6 @@
         <button id="newGame">New game</button>
         <button id="solveButton" class="button--primary">Solve</button>
         <button id="checkSolution">Check</button>
-      </div>
-      <div class="feedback-row">
-        <div id="solutionBox" class="solution">Solution will appear here.</div>
         <div id="userFeedback" class="status"></div>
       </div>
     </section>

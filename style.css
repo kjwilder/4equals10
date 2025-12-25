@@ -96,6 +96,7 @@ body {
 }
 
 .field--operators {
+  flex-direction: row;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);

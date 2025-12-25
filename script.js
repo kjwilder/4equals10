@@ -8,7 +8,6 @@ const operatorInputs = Array.from(document.querySelectorAll('.operator'));
 const allowReorderInput = document.getElementById('allowReorder');
 const allowParenthesesInput = document.getElementById('allowParentheses');
 const solveButton = document.getElementById('solveButton');
-const solutionBox = document.getElementById('solutionBox');
 const newGameButton = document.getElementById('newGame');
 const userSolutionInput = document.getElementById('userSolution');
 const checkSolutionButton = document.getElementById('checkSolution');
@@ -204,17 +203,16 @@ function solvePuzzle({ digits, target, operators, allowReorder, allowParentheses
 }
 
 function showSolutionMessage(message, expression) {
-  solutionBox.innerHTML = '';
   const status = document.createElement('div');
   status.className = 'status';
   status.textContent = message;
-  solutionBox.appendChild(status);
+  userFeedback.textContent = message;
 
   if (expression) {
     const exprEl = document.createElement('div');
     exprEl.className = 'solution__expression';
     exprEl.textContent = expression;
-    solutionBox.appendChild(exprEl);
+    userSolutionInput.value = expression;
   }
 }
 
@@ -250,7 +248,7 @@ function generateSolvableDigits(count) {
     });
     if (expr) return digits;
   }
-  const fallback = '0254'.split('').map(Number);
+  const fallback = '1234'.split('').map(Number);
   while (fallback.length < count) fallback.push(Math.floor(Math.random() * 10));
   return fallback.slice(0, count);
 }
@@ -282,7 +280,7 @@ function handleSolve() {
   const expression = solvePuzzle({ digits, target, operators, allowReorder, allowParentheses });
 
   if (expression) {
-    showSolutionMessage('Solution found:', expression);
+    showSolutionMessage('Solution found', expression);
   } else {
     showSolutionMessage('No solution with the selected rules.');
   }
@@ -292,7 +290,6 @@ function handleNewGame() {
   const count = Number(digitCountInput.value);
   const digits = generateSolvableDigits(count);
   digitsInput.value = digits.join('');
-  showSolutionMessage('New digits generated. Press Solve to see a solution.');
   if (userSolutionInput) userSolutionInput.value = '';
   if (userFeedback) userFeedback.textContent = '';
 }
@@ -311,7 +308,7 @@ function validateUserSolution() {
   const allowReorder = allowReorderInput.checked;
   const allowParentheses = allowParenthesesInput.checked;
 
-  const invalidChars = /[^0-9+*\\/()\\s-]/;
+  const invalidChars = /[^0-9+*\\/()\s-]/;
   if (invalidChars.test(expression)) {
     userFeedback.textContent = 'Only digits, operators, and parentheses are allowed.';
     userFeedback.classList.remove('status--success');
@@ -331,7 +328,7 @@ function validateUserSolution() {
     return;
   }
 
-  const numberTokens = expression.match(/\\d+/g) || [];
+  const numberTokens = expression.match(/\d+/g) || [];
   if (!numberTokens.every((token) => token.length === 1)) {
     userFeedback.textContent = 'Use the provided single-digit numbers only.';
     userFeedback.classList.remove('status--success');
@@ -387,10 +384,10 @@ function validateUserSolution() {
   }
 
   if (approxEqual(result, target)) {
-    userFeedback.textContent = 'Correct! Your expression equals the target.';
+    userFeedback.textContent = `Correct! ${expression} equals ${target}.`;
     userFeedback.classList.add('status--success');
   } else {
-    userFeedback.textContent = `Not quite. Your expression equals ${result}.`;
+    userFeedback.textContent = `Not quite. ${expression} equals ${result}.`;
     userFeedback.classList.remove('status--success');
   }
 }
