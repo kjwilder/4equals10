@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4=10 Solver</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="page__header">
+      <h1>4equals10</h1>
+      <p>Solve digit puzzles with custom operators, targets, and rules.</p>
+    </header>
+
+    <section class="card">
+      <h2>Setup</h2>
+      <div class="grid">
+        <label class="field">
+          <span>Number of digits</span>
+          <input id="digitCount" type="number" min="2" max="8" value="4" />
+        </label>
+        <label class="field">
+          <span>Target sum</span>
+          <input id="targetSum" type="number" value="10" />
+        </label>
+        <fieldset class="field field--operators">
+          <legend>Operators</legend>
+          <label><input type="checkbox" class="operator" value="+" checked /> +</label>
+          <label><input type="checkbox" class="operator" value="-" checked /> -</label>
+          <label><input type="checkbox" class="operator" value="*" checked /> *</label>
+          <label><input type="checkbox" class="operator" value="/" checked /> /</label>
+        </fieldset>
+        <label class="field field--checkbox">
+          <input id="allowReorder" type="checkbox" checked />
+          <span>Allow reordering</span>
+        </label>
+        <label class="field field--checkbox">
+          <input id="allowParentheses" type="checkbox" checked />
+          <span>Allow parentheses</span>
+        </label>
+      </div>
+      <label class="field field--wide">
+        <span>Digits</span>
+        <input id="digitsInput" type="text" value="0254" inputmode="numeric" />
+      </label>
+      <div class="actions">
+        <button id="newGame">New game</button>
+        <button id="solveButton" class="button--primary">Solve</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Solution</h2>
+      <div id="solutionBox" class="solution">Press Solve to see the answer.</div>
+    </section>
+  </main>
+  <script type="module" src="script.js"></script>
+</body>
+</html>

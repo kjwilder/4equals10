@@ -30,21 +30,16 @@ Solve 4=10 puzzles
     very slow when there are a lot of digits, especially for cases that have
     no solution.
 
-## Usage examples
-- `fourten - Prints solutions for all four-digit sequences.
-- `fourten -e 20` - Prints solutions for all four-digit sequences when
-  the equation should equal 20.
-- `fourten -e 4 -nd 3` - Prints solutions for all three-digit
-  sequences when the equation should equal 4.
-- `fourten -d 123456 -e 25` - Finds a solution, if it exists, for the six
-  digits 123456 that equals 25, e.g., `1 * 2 + 3 * 4 + 5 + 6`.
-- `fourten -d 123456 -e 19 -o '+-'` - Find a solution for the six
-  digits 123456 that equals 19 using only addition and subtraction.
+## Web UI
 
-## Some details
-- A "simple" solution without parentheses and reordering will be shown and labeled `on`
-  if it exists.
-- If no simple solution exists, the program will attempt, in order, to find:
-  - a solution with parentheses (`op`).
-  - a solution with reordering and no parentheses (`rn`).
-  - a solution with reordering and parentheses (`rp`).
+A JavaScript port with a small UI lives in `index.html`. Open the file in a browser to:
+
+- Select the number of digits (defaults to 4).
+- Choose the target sum (defaults to 10).
+- Toggle allowed operators (+, -, \\*, /).
+- Decide whether reordering and parentheses are allowed.
+- Generate solvable random digits with **New game** or manually edit the digits box.
+- Click **Solve** to display a solution or indicate that none exists with the chosen rules.
+
+The starting digits always have a valid solution when you keep the default operators with
+reordering and parentheses enabled.
