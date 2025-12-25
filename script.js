@@ -324,7 +324,7 @@ function validateUserSolution() {
     return;
   }
 
-  const usedOps = expression.match(/[+\\-*\\/]/g) || [];
+  const usedOps = expression.match(/[+*/-]/g) || [];
   if (!usedOps.every((op) => operators.includes(op))) {
     userFeedback.textContent = 'You used an operator that is not allowed.';
     userFeedback.classList.remove('status--success');
