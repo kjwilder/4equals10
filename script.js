@@ -311,7 +311,7 @@ function validateUserSolution() {
   const allowReorder = allowReorderInput.checked;
   const allowParentheses = allowParenthesesInput.checked;
 
-  const invalidChars = /[^\\d+\\-*/()\\s]/;
+  const invalidChars = /[^0-9+\\-*\\/()\\s]/;
   if (invalidChars.test(expression)) {
     userFeedback.textContent = 'Only digits, operators, and parentheses are allowed.';
     userFeedback.classList.remove('status--success');
@@ -324,7 +324,7 @@ function validateUserSolution() {
     return;
   }
 
-  const usedOps = expression.match(/[+\\-*/]/g) || [];
+  const usedOps = expression.match(/[+\\-*\\/]/g) || [];
   if (!usedOps.every((op) => operators.includes(op))) {
     userFeedback.textContent = 'You used an operator that is not allowed.';
     userFeedback.classList.remove('status--success');
