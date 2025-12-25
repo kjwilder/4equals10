@@ -10,6 +10,9 @@ const allowParenthesesInput = document.getElementById('allowParentheses');
 const solveButton = document.getElementById('solveButton');
 const solutionBox = document.getElementById('solutionBox');
 const newGameButton = document.getElementById('newGame');
+const userSolutionInput = document.getElementById('userSolution');
+const checkSolutionButton = document.getElementById('checkSolution');
+const userFeedback = document.getElementById('userFeedback');
 
 function approxEqual(a, b) {
   return Math.abs(a - b) < TOLERANCE;
@@ -144,12 +147,22 @@ function enumerateExpressions(values, texts, operators, memo) {
   return results;
 }
 
-function stripOuterParens(expression) {
-  let expr = expression.trim();
-  while (expr.startsWith('(') && expr.endsWith(')')) {
-    expr = expr.slice(1, -1).trim();
+function isFullyWrapped(expr) {
+  if (!expr.startsWith('(') || !expr.endsWith(')')) return false;
+  let depth = 0;
+  for (let i = 0; i < expr.length; i += 1) {
+    const ch = expr[i];
+    if (ch === '(') depth += 1;
+    else if (ch === ')') depth -= 1;
+    if (depth === 0 && i < expr.length - 1) return false;
+    if (depth < 0) return false;
   }
-  return expr;
+  return depth === 0;
+}
+
+function stripOuterParens(expression) {
+  const expr = expression.trim();
+  return isFullyWrapped(expr) ? expr.slice(1, -1).trim() : expr;
 }
 
 function solveWithParentheses(digits, operators, target) {
@@ -280,12 +293,115 @@ function handleNewGame() {
   const digits = generateSolvableDigits(count);
   digitsInput.value = digits.join('');
   showSolutionMessage('New digits generated. Press Solve to see a solution.');
+  if (userSolutionInput) userSolutionInput.value = '';
+  if (userFeedback) userFeedback.textContent = '';
+}
+
+function validateUserSolution() {
+  const expression = (userSolutionInput?.value ?? '').trim();
+  if (!expression) {
+    userFeedback.textContent = 'Enter an expression to check.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  const digits = parseDigits(digitsInput.value);
+  const target = Number(targetInput.value);
+  const operators = currentOperators();
+  const allowReorder = allowReorderInput.checked;
+  const allowParentheses = allowParenthesesInput.checked;
+
+  const invalidChars = /[^\\d+\\-*/()\\s]/;
+  if (invalidChars.test(expression)) {
+    userFeedback.textContent = 'Only digits, operators, and parentheses are allowed.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  if (!allowParentheses && /[()]/.test(expression)) {
+    userFeedback.textContent = 'Parentheses are not allowed for this puzzle.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  const usedOps = expression.match(/[+\\-*/]/g) || [];
+  if (!usedOps.every((op) => operators.includes(op))) {
+    userFeedback.textContent = 'You used an operator that is not allowed.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  const numberTokens = expression.match(/\\d+/g) || [];
+  if (!numberTokens.every((token) => token.length === 1)) {
+    userFeedback.textContent = 'Use the provided single-digit numbers only.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  if (numberTokens.length !== digits.length) {
+    userFeedback.textContent = 'Use all digits exactly once.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  if (allowReorder) {
+    const expectedCounts = digits.reduce((map, d) => {
+      map[d] = (map[d] || 0) + 1;
+      return map;
+    }, {});
+    const actualCounts = numberTokens.reduce((map, token) => {
+      const d = Number(token);
+      map[d] = (map[d] || 0) + 1;
+      return map;
+    }, {});
+    for (const [digit, count] of Object.entries(expectedCounts)) {
+      if (actualCounts[digit] !== count) {
+        userFeedback.textContent = 'Digits do not match the puzzle.';
+        userFeedback.classList.remove('status--success');
+        return;
+      }
+    }
+  } else {
+    const expected = digits.join('');
+    if (numberTokens.join('') !== expected) {
+      userFeedback.textContent = 'Digits must be used in the given order.';
+      userFeedback.classList.remove('status--success');
+      return;
+    }
+  }
+
+  let result;
+  try {
+    // eslint-disable-next-line no-new-func
+    result = Function(`\"use strict\"; return (${expression});`)();
+  } catch (error) {
+    userFeedback.textContent = 'Invalid expression. Please check your syntax.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  if (result === null || Number.isNaN(result) || !Number.isFinite(result)) {
+    userFeedback.textContent = 'The expression is not valid to evaluate.';
+    userFeedback.classList.remove('status--success');
+    return;
+  }
+
+  if (approxEqual(result, target)) {
+    userFeedback.textContent = 'Correct! Your expression equals the target.';
+    userFeedback.classList.add('status--success');
+  } else {
+    userFeedback.textContent = `Not quite. Your expression equals ${result}.`;
+    userFeedback.classList.remove('status--success');
+  }
 }
 
 function init() {
   digitCountInput.addEventListener('change', adjustDigitInputLength);
   solveButton.addEventListener('click', handleSolve);
   newGameButton.addEventListener('click', handleNewGame);
+  if (checkSolutionButton) {
+    checkSolutionButton.addEventListener('click', validateUserSolution);
+  }
   handleNewGame();
 }
 

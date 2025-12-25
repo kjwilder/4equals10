@@ -172,6 +172,20 @@ button:active { transform: translateY(0); }
   font-size: 14px;
 }
 
+.manual {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.actions--inline {
+  margin-top: 8px;
+}
+
+.status--success {
+  color: var(--accent);
+}
+
 @media (max-width: 540px) {
   .page {
     padding: 16px;

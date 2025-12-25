@@ -53,6 +53,16 @@
     <section class="card">
       <h2>Solution</h2>
       <div id="solutionBox" class="solution">Press Solve to see the answer.</div>
+      <div class="manual">
+        <label class="field field--wide">
+          <span>Try your own solution</span>
+          <input id="userSolution" type="text" placeholder="e.g., (4 + 1) * (7 - 5)" />
+        </label>
+        <div class="actions actions--inline">
+          <button id="checkSolution">Check my solution</button>
+        </div>
+        <div id="userFeedback" class="status"></div>
+      </div>
     </section>
   </main>
   <script src="script.js" defer></script>

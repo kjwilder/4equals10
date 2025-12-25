@@ -40,6 +40,7 @@ A JavaScript port with a small UI lives in `index.html`. Open the file in a brow
 - Decide whether reordering and parentheses are allowed.
 - Generate solvable random digits with **New game** or manually edit the digits box.
 - Click **Solve** to display a solution or indicate that none exists with the chosen rules.
+- Type your own expression in the Solution area to check if it satisfies the current puzzle.
 
 The starting digits always have a valid solution when you keep the default operators with
 reordering and parentheses enabled.
