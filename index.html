@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4=10 Solver</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1 align=center>4=10</h1>
+      <div class="layout">
+        <div class="stack">
+          <div class="grid">
+            <label class="field">
+              <span>Number of digits</span>
+              <input id="digitCount" type="number" min="2" max="8" value="4" />
+            </label>
+            <label class="field">
+              <span>Target sum</span>
+              <input id="targetSum" type="number" value="10" />
+            </label>
+            <label class="field field--checkbox">
+              <input id="allowReorder" type="checkbox" checked />
+              <span>Allow reordering</span>
+            </label>
+            <label class="field">
+            <label class="field field--checkbox">
+              <input id="allowParentheses" type="checkbox" checked />
+              <span>Allow parentheses</span>
+            </label>
+          </div>
+          <fieldset class="field field--operators">
+            <legend>Operators</legend>
+            <label><input type="checkbox" class="operator" value="+" checked /> +</label>
+            <label><input type="checkbox" class="operator" value="-" checked /> -</label>
+            <label><input type="checkbox" class="operator" value="*" checked /> *</label>
+            <label><input type="checkbox" class="operator" value="/" checked /> /</label>
+          </fieldset>
+        </div>
+        <div class="inputs-row">
+          <label class="field">
+            <span>Digits</span>
+            <input id="digitsInput" type="text" value="1234" inputmode="numeric" />
+          </label>
+          <label class="field">
+            <span>Solution</span>
+            <input id="userSolution" type="text" />
+          </label>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="newGame">New game</button>
+        <button id="solveButton" class="button--primary">Solve</button>
+        <button id="checkSolution">Check</button>
+        <div id="userFeedback" class="status"></div>
+      </div>
+    </section>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>
