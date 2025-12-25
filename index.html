@@ -15,52 +15,52 @@
 
     <section class="card">
       <h2>Setup</h2>
-      <div class="grid">
-        <label class="field">
-          <span>Number of digits</span>
-          <input id="digitCount" type="number" min="2" max="8" value="4" />
-        </label>
-        <label class="field">
-          <span>Target sum</span>
-          <input id="targetSum" type="number" value="10" />
-        </label>
-        <fieldset class="field field--operators">
-          <legend>Operators</legend>
-          <label><input type="checkbox" class="operator" value="+" checked /> +</label>
-          <label><input type="checkbox" class="operator" value="-" checked /> -</label>
-          <label><input type="checkbox" class="operator" value="*" checked /> *</label>
-          <label><input type="checkbox" class="operator" value="/" checked /> /</label>
-        </fieldset>
-        <label class="field field--checkbox">
-          <input id="allowReorder" type="checkbox" checked />
-          <span>Allow reordering</span>
-        </label>
-        <label class="field field--checkbox">
-          <input id="allowParentheses" type="checkbox" checked />
-          <span>Allow parentheses</span>
-        </label>
+      <div class="layout">
+        <div class="stack">
+          <div class="grid">
+            <label class="field">
+              <span>Number of digits</span>
+              <input id="digitCount" type="number" min="2" max="8" value="4" />
+            </label>
+            <label class="field">
+              <span>Target sum</span>
+              <input id="targetSum" type="number" value="10" />
+            </label>
+            <label class="field field--checkbox">
+              <input id="allowReorder" type="checkbox" checked />
+              <span>Allow reordering</span>
+            </label>
+            <label class="field field--checkbox">
+              <input id="allowParentheses" type="checkbox" checked />
+              <span>Allow parentheses</span>
+            </label>
+          </div>
+          <fieldset class="field field--operators">
+            <legend>Operators</legend>
+            <label><input type="checkbox" class="operator" value="+" checked /> +</label>
+            <label><input type="checkbox" class="operator" value="-" checked /> -</label>
+            <label><input type="checkbox" class="operator" value="*" checked /> *</label>
+            <label><input type="checkbox" class="operator" value="/" checked /> /</label>
+          </fieldset>
+        </div>
+        <div class="inputs-row">
+          <label class="field">
+            <span>Digits</span>
+            <input id="digitsInput" type="text" value="0254" inputmode="numeric" />
+          </label>
+          <label class="field">
+            <span>Your solution</span>
+            <input id="userSolution" type="text" />
+          </label>
+        </div>
       </div>
-      <label class="field field--wide">
-        <span>Digits</span>
-        <input id="digitsInput" type="text" value="0254" inputmode="numeric" />
-      </label>
       <div class="actions">
         <button id="newGame">New game</button>
         <button id="solveButton" class="button--primary">Solve</button>
+        <button id="checkSolution">Check</button>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>Solution</h2>
-      <div id="solutionBox" class="solution">Press Solve to see the answer.</div>
-      <div class="manual">
-        <label class="field field--wide">
-          <span>Try your own solution</span>
-          <input id="userSolution" type="text" placeholder="e.g., (4 + 1) * (7 - 5)" />
-        </label>
-        <div class="actions actions--inline">
-          <button id="checkSolution">Check my solution</button>
-        </div>
+      <div class="feedback-row">
+        <div id="solutionBox" class="solution">Solution will appear here.</div>
         <div id="userFeedback" class="status"></div>
       </div>
     </section>
