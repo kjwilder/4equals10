@@ -369,7 +369,6 @@ function validateUserSolution() {
 
   let result;
   try {
-    // eslint-disable-next-line no-new-func
     result = Function(`\"use strict\"; return (${expression});`)();
   } catch (error) {
     userFeedback.textContent = 'Invalid expression. Please check your syntax.';
