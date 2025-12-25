@@ -311,7 +311,7 @@ function validateUserSolution() {
   const allowReorder = allowReorderInput.checked;
   const allowParentheses = allowParenthesesInput.checked;
 
-  const invalidChars = /[^0-9+\\-*\\/()\\s]/;
+  const invalidChars = /[^0-9+*\\/()\\s-]/;
   if (invalidChars.test(expression)) {
     userFeedback.textContent = 'Only digits, operators, and parentheses are allowed.';
     userFeedback.classList.remove('status--success');
