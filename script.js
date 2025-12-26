@@ -178,9 +178,9 @@ function adjustDigitInputLength() {
 }
 
 function generateSolvableDigits(count) {
-  const target = 10;
+  const target = Number(targetInput.value);
   const operators = DEFAULT_OPERATORS;
-  const limit = 800;
+  const limit = 1000;
   for (let i = 0; i < limit; i += 1) {
     const digits = Array.from({ length: count }, () => Math.floor(Math.random() * 10));
     const expr = solvePuzzle({
@@ -193,6 +193,8 @@ function generateSolvableDigits(count) {
     if (expr) return digits;
   }
   const fallback = '1234'.split('').map(Number);
+  userFeedback.textContent = 'Unable to produce a solvable puzzle';
+  userFeedback.classList.remove('status--success');
   while (fallback.length < count) fallback.push(Math.floor(Math.random() * 10));
   return fallback.slice(0, count);
 }
@@ -231,11 +233,11 @@ function handleSolve() {
 }
 
 function handleNewGame() {
+  if (userSolutionInput) userSolutionInput.value = '';
+  if (userFeedback) userFeedback.textContent = '';
   const count = Number(digitCountInput.value);
   const digits = generateSolvableDigits(count);
   digitsInput.value = digits.join('');
-  if (userSolutionInput) userSolutionInput.value = '';
-  if (userFeedback) userFeedback.textContent = '';
 }
 
 function validateUserSolution() {
