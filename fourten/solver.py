@@ -26,21 +26,18 @@ def try_to_solve_with_parentheses(expected, args):
     return None
 
 
-def try_to_solve(args, expected=10, operators="+-/*"):
-    nops = len(args) - 1
+def try_to_solve(digits, expected=10, operators="+-/*"):
+    nops = len(digits) - 1
     offsets = [len(operators) ** i for i in range(nops - 1, -1, -1)]
     peq = None
     for i in range(len(operators) ** nops):
         ops = [operators[i // offsets[j] % len(operators)] for j in range(nops)]
-        eq = test_eq(
-            expected, tuple(x for t in zip(args, ops) for x in t) + (args[-1],)
-        )
+        args_ops = tuple(x for t in zip(digits, ops) for x in t) + (digits[-1],)
+        eq = test_eq(expected, args_ops)
         if eq:
             return eq, "on"
         if not peq:
-            peq = try_to_solve_with_parentheses(
-                expected, tuple(x for t in zip(args, ops) for x in t) + (args[-1],)
-            )
+            peq = try_to_solve_with_parentheses(expected, args_ops)
     if peq:
         return peq, "op"
     return None
@@ -93,8 +90,8 @@ def solve_one(digits, expected, operators):
 def solve_all(num_digits, expected, operators):
     solutions = {}
     for n in range(10**num_digits):
-        values = tuple(f"{n:0>{num_digits}}")
-        solutions[values] = try_to_solve(values, expected=expected, operators=operators)
+        digits = tuple(f"{n:0>{num_digits}}")
+        solutions[digits] = try_to_solve(digits, expected=expected, operators=operators)
     solutions = update_solutions(solutions)
     for quad in sorted(solutions):
         sq = ""
