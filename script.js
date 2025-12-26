@@ -14,6 +14,9 @@ const checkSolutionButton = document.getElementById('checkSolution');
 const userFeedback = document.getElementById('userFeedback');
 
 function approxEqual(a, b) {
+  if (a === null || b === null || Number.isNaN(a) || Number.isNaN(b)) {
+    return false;
+  }
   return Math.abs(a - b) < TOLERANCE;
 }
 
@@ -22,54 +25,82 @@ function parseDigits(raw) {
   return cleaned.split('').filter(Boolean).map((d) => Number(d));
 }
 
-function uniquePermutations(nums) {
-  const used = Array(nums.length).fill(false);
-  const results = [];
-  const current = [];
-  const seen = new Set();
+function* uniquePermutations(input, includePerms = true) {
+  const original = input.slice();
+  yield original.slice();
 
-  function backtrack() {
-    if (current.length === nums.length) {
-      const key = current.join(',');
-      if (!seen.has(key)) {
-        seen.add(key);
-        results.push([...current]);
+  if (!includePerms) return;
+
+  const arr = [...input].sort();
+  const used = new Array(arr.length).fill(false);
+  const perm = [];
+
+  let skippedOriginal = false;
+
+  function* backtrack() {
+    if (perm.length === arr.length) {
+      if (
+        !skippedOriginal &&
+        perm.every((v, i) => v === original[i])
+      ) {
+        skippedOriginal = true;
+        return;
       }
+
+      yield perm.slice();
       return;
     }
 
-    for (let i = 0; i < nums.length; i += 1) {
+    for (let i = 0; i < arr.length; i++) {
       if (used[i]) continue;
+      if (i > 0 && arr[i] === arr[i - 1] && !used[i - 1]) continue;
+
       used[i] = true;
-      current.push(nums[i]);
-      backtrack();
-      current.pop();
+      perm.push(arr[i]);
+
+      yield* backtrack();
+
+      perm.pop();
       used[i] = false;
     }
   }
 
-  backtrack();
-  return results;
+  yield* backtrack();
 }
 
-function generateOperatorSequences(operators, length) {
-  const results = [];
-  const sequence = [];
+function* candidateOperations(operators, l) {
+  if (!Number.isInteger(l) || l < 0) throw new Error("l must be a non-negative integer");
+  if (l === 0) { yield []; return; }
 
-  function build(depth) {
-    if (depth === length) {
-      results.push([...sequence]);
-      return;
+  const n = operators.length;
+  if (n === 0) return; // no tuples if l>0 and no operators
+
+  const idx = Array(l).fill(0);
+  while (true) {
+    yield idx.map(i => operators[i]);
+
+    // increment base-n number stored in idx (right-to-left)
+    let pos = l - 1;
+    while (pos >= 0) {
+      idx[pos]++;
+      if (idx[pos] < n) break;
+      idx[pos] = 0;
+      pos--;
     }
-    operators.forEach((op) => {
-      sequence.push(op);
-      build(depth + 1);
-      sequence.pop();
-    });
+    if (pos < 0) return; // overflow => done
   }
+}
 
-  build(0);
-  return results;
+function interleaveArrays(a, b, sep = " ") {
+  if (a.length !== b.length + 1) {
+    throw new Error("Array a must be exactly one element longer than b");
+  }
+  const result = [];
+  for (let i = 0; i < b.length; i++) {
+    result.push(a[i], b[i]);
+  }
+  result.push(a[a.length - 1]);
+  return result.join(sep);
 }
 
 function applyOp(a, b, op) {
@@ -80,35 +111,8 @@ function applyOp(a, b, op) {
   return null;
 }
 
-function evaluateLinear(numbers, operators) {
-  const values = [numbers[0]];
-  const opStack = [];
-  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
-
-  function reduce() {
-    const op = opStack.pop();
-    const b = values.pop();
-    const a = values.pop();
-    const res = applyOp(a, b, op);
-    if (res === null || Number.isNaN(res)) return false;
-    values.push(res);
-    return true;
-  }
-
-  for (let i = 0; i < operators.length; i += 1) {
-    const currentOp = operators[i];
-    while (opStack.length && precedence[opStack[opStack.length - 1]] >= precedence[currentOp]) {
-      if (!reduce()) return null;
-    }
-    opStack.push(currentOp);
-    values.push(numbers[i + 1]);
-  }
-
-  while (opStack.length) {
-    if (!reduce()) return null;
-  }
-
-  return values[0];
+function evaluateEquation(eq) {
+  return Function(`\"use strict\"; return (${eq});`)();
 }
 
 function enumerateExpressions(values, texts, operators, memo) {
@@ -174,23 +178,17 @@ function solveWithParentheses(digits, operators, target) {
 }
 
 function solveWithoutParentheses(digits, operators, target) {
-  const operatorSequences = generateOperatorSequences(operators, digits.length - 1);
-  for (const sequence of operatorSequences) {
-    const value = evaluateLinear(digits, sequence);
-    if (value === null || Number.isNaN(value)) continue;
+  for (const ops of candidateOperations(operators, digits.length - 1)) {
+    const value = evaluateEquation(interleaveArrays(digits, ops));
     if (approxEqual(value, target)) {
-      const expr = digits
-        .map(String)
-        .reduce((acc, cur, idx) => (idx === 0 ? cur : `${acc} ${sequence[idx - 1]} ${cur}`), '');
-      return expr;
+      return interleaveArrays(digits, ops);
     }
   }
   return null;
 }
 
 function solvePuzzle({ digits, target, operators, allowReorder, allowParentheses }) {
-  const puzzles = allowReorder ? uniquePermutations(digits) : [digits];
-  for (const perm of puzzles) {
+  for (const perm of uniquePermutations(digits, allowReorder)) {
     if (allowParentheses) {
       const expr = solveWithParentheses(perm, operators, target);
       if (expr) return expr;
@@ -302,45 +300,43 @@ function validateUserSolution() {
     return;
   }
 
-  const digits = parseDigits(digitsInput.value);
-  const target = Number(targetInput.value);
-  const operators = currentOperators();
-  const allowReorder = allowReorderInput.checked;
-  const allowParentheses = allowParenthesesInput.checked;
-
   const invalidChars = /[^0-9+*\\/()\s-]/;
   if (invalidChars.test(expression)) {
-    userFeedback.textContent = 'Only digits, operators, and parentheses are allowed.';
+    userFeedback.textContent = 'Use only digits, operators and parentheses.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
+  const allowParentheses = allowParenthesesInput.checked;
   if (!allowParentheses && /[()]/.test(expression)) {
-    userFeedback.textContent = 'Parentheses are not allowed for this puzzle.';
+    userFeedback.textContent = 'Parentheses currently are not allowed.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
   const usedOps = expression.match(/[+*/-]/g) || [];
+  const operators = currentOperators();
   if (!usedOps.every((op) => operators.includes(op))) {
-    userFeedback.textContent = 'You used an operator that is not allowed.';
+    userFeedback.textContent = 'You only the specified operators.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
   const numberTokens = expression.match(/\d+/g) || [];
   if (!numberTokens.every((token) => token.length === 1)) {
-    userFeedback.textContent = 'Use the provided single-digit numbers only.';
+    userFeedback.textContent = 'Use only the specified digits.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
+  const digits = parseDigits(digitsInput.value);
   if (numberTokens.length !== digits.length) {
-    userFeedback.textContent = 'Use all digits exactly once.';
+    userFeedback.textContent = 'Use each digit exactly once.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
+  const allowReorder = allowReorderInput.checked;
   if (allowReorder) {
     const expectedCounts = digits.reduce((map, d) => {
       map[d] = (map[d] || 0) + 1;
@@ -353,7 +349,7 @@ function validateUserSolution() {
     }, {});
     for (const [digit, count] of Object.entries(expectedCounts)) {
       if (actualCounts[digit] !== count) {
-        userFeedback.textContent = 'Digits do not match the puzzle.';
+        userFeedback.textContent = 'Use only the specified digits.';
         userFeedback.classList.remove('status--success');
         return;
       }
@@ -369,7 +365,7 @@ function validateUserSolution() {
 
   let result;
   try {
-    result = Function(`\"use strict\"; return (${expression});`)();
+    result = evaluateEquation(expression);
   } catch (error) {
     userFeedback.textContent = 'Invalid expression. Please check your syntax.';
     userFeedback.classList.remove('status--success');
@@ -377,16 +373,17 @@ function validateUserSolution() {
   }
 
   if (result === null || Number.isNaN(result) || !Number.isFinite(result)) {
-    userFeedback.textContent = 'The expression is not valid to evaluate.';
+    userFeedback.textContent = 'The expression does not evaluate to a number.';
     userFeedback.classList.remove('status--success');
     return;
   }
 
+  const target = Number(targetInput.value);
   if (approxEqual(result, target)) {
     userFeedback.textContent = `Correct! ${expression} equals ${target}.`;
     userFeedback.classList.add('status--success');
   } else {
-    userFeedback.textContent = `Not quite. ${expression} equals ${result}.`;
+    userFeedback.textContent = `Incorrect! ${expression} equals ${result} not ${target}.`;
     userFeedback.classList.remove('status--success');
   }
 }
