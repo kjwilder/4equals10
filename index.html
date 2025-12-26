@@ -25,7 +25,6 @@
               <input id="allowReorder" type="checkbox" checked />
               <span>Allow reordering</span>
             </label>
-            <label class="field">
             <label class="field field--checkbox">
               <input id="allowParentheses" type="checkbox" checked />
               <span>Allow parentheses</span>
@@ -42,7 +41,17 @@
         <div class="inputs-row">
           <label class="field">
             <span>Digits</span>
-            <input id="digitsInput" type="text" value="1234" inputmode="numeric" />
+            <div class="input-with-action">
+              <input id="digitsInput" type="text" value="1234" inputmode="numeric" />
+              <button id="refreshDigits" type="button" class="icon-button" aria-label="New digits">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 6v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M20 11a8 8 0 0 0-14.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <path d="M4 13a8 8 0 0 0 14.5 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
           </label>
           <label class="field">
             <span>Solution</span>
@@ -51,7 +60,6 @@
         </div>
       </div>
       <div class="actions">
-        <button id="newGame">New game</button>
         <button id="solveButton" class="button--primary">Solve</button>
         <button id="checkSolution">Check</button>
         <div id="userFeedback" class="status"></div>
