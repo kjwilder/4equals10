@@ -7,7 +7,7 @@ const targetInput = document.getElementById('targetSum');
 const operatorInputs = Array.from(document.querySelectorAll('.operator'));
 const allowReorderInput = document.getElementById('allowReorder');
 const allowParenthesesInput = document.getElementById('allowParentheses');
-const solveButton = document.getElementById('solveButton');
+const solveIconButton = document.getElementById('solveIcon');
 const refreshDigitsButton = document.getElementById('refreshDigits');
 const userSolutionInput = document.getElementById('userSolution');
 const checkSolutionButton = document.getElementById('checkSolution');
@@ -358,7 +358,7 @@ function validateUserSolution() {
 
 function init() {
   digitCountInput.addEventListener('change', adjustDigitInputLength);
-  solveButton.addEventListener('click', handleSolve);
+  solveIconButton.addEventListener('click', handleSolve);
   refreshDigitsButton.addEventListener('click', handleNewGame);
   if (checkSolutionButton) {
     checkSolutionButton.addEventListener('click', validateUserSolution);

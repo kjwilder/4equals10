@@ -98,23 +98,20 @@ body {
 }
 
 .field--operators {
-  flex-direction: row;
+  gap: 8px;
+}
+
+.operators-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--input);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
 }
 
-.field--operators legend {
-  padding: 0 6px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.field--operators label {
+.operators-options label {
   display: flex;
   align-items: center;
   gap: 8px;
