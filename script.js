@@ -91,97 +91,48 @@ function* candidateOperations(operators, l) {
   }
 }
 
-function interleaveArrays(a, b, sep = " ") {
-  if (a.length !== b.length + 1) {
-    throw new Error("Array a must be exactly one element longer than b");
-  }
-  const result = [];
-  for (let i = 0; i < b.length; i++) {
-    result.push(a[i], b[i]);
-  }
-  result.push(a[a.length - 1]);
-  return result.join(sep);
-}
-
-function applyOp(a, b, op) {
-  if (op === '+') return a + b;
-  if (op === '-') return a - b;
-  if (op === '*') return a * b;
-  if (op === '/') return b === 0 ? null : a / b;
-  return null;
-}
-
 function evaluateEquation(eq) {
   return Function(`\"use strict\"; return (${eq});`)();
 }
 
-function enumerateExpressions(values, texts, operators, memo) {
-  if (values.length === 1) {
-    return [{ value: values[0], expr: texts[0] }];
+function buildTokens(digits, ops) {
+  const tokens = [];
+  for (let i = 0; i < digits.length; i += 1) {
+    tokens.push(String(digits[i]));
+    if (i < ops.length) tokens.push(ops[i]);
   }
-
-  const key = values.join(',');
-  if (memo.has(key)) return memo.get(key);
-
-  const results = [];
-  for (let i = 1; i < values.length; i += 1) {
-    const leftVals = values.slice(0, i);
-    const rightVals = values.slice(i);
-    const leftTexts = texts.slice(0, i);
-    const rightTexts = texts.slice(i);
-
-    const leftResults = enumerateExpressions(leftVals, leftTexts, operators, memo);
-    const rightResults = enumerateExpressions(rightVals, rightTexts, operators, memo);
-
-    leftResults.forEach((l) => {
-      rightResults.forEach((r) => {
-        operators.forEach((op) => {
-          if (op === '/' && Math.abs(r.value) < TOLERANCE) return;
-          const val = applyOp(l.value, r.value, op);
-          if (val === null || Number.isNaN(val)) return;
-          const expr = `(${l.expr} ${op} ${r.expr})`;
-          results.push({ value: val, expr });
-        });
-      });
-    });
-  }
-
-  memo.set(key, results);
-  return results;
+  return tokens;
 }
 
-function isFullyWrapped(expr) {
-  if (!expr.startsWith('(') || !expr.endsWith(')')) return false;
-  let depth = 0;
-  for (let i = 0; i < expr.length; i += 1) {
-    const ch = expr[i];
-    if (ch === '(') depth += 1;
-    else if (ch === ')') depth -= 1;
-    if (depth === 0 && i < expr.length - 1) return false;
-    if (depth < 0) return false;
-  }
-  return depth === 0;
+function tokensToExpression(tokens) {
+  return tokens.join(' ');
 }
 
-function stripOuterParens(expression) {
-  const expr = expression.trim();
-  return isFullyWrapped(expr) ? expr.slice(1, -1).trim() : expr;
+function evaluateTokens(tokens) {
+  return evaluateEquation(tokensToExpression(tokens));
 }
 
-function solveWithParentheses(digits, operators, target) {
-  const values = digits.map(Number);
-  const texts = digits.map(String);
-  const memo = new Map();
-  const expressions = enumerateExpressions(values, texts, operators, memo);
-  const match = expressions.find((item) => approxEqual(item.value, target));
-  return match ? stripOuterParens(match.expr) : null;
-}
+function solveWithSingleParentheses(digits, operators, target, allowParentheses) {
+  const opCount = digits.length - 1;
+  for (const ops of candidateOperations(operators, opCount)) {
+    const baseTokens = buildTokens(digits, ops);
+    if (approxEqual(evaluateTokens(baseTokens), target)) {
+      return tokensToExpression(baseTokens);
+    }
 
-function solveWithoutParentheses(digits, operators, target) {
-  for (const ops of candidateOperations(operators, digits.length - 1)) {
-    const value = evaluateEquation(interleaveArrays(digits, ops));
-    if (approxEqual(value, target)) {
-      return interleaveArrays(digits, ops);
+    if (!allowParentheses) continue;
+
+    const tokenCount = baseTokens.length;
+    for (let gap = 4; gap < tokenCount; gap += 2) {
+      for (let start = 0; start <= tokenCount + 1 - gap; start += 2) {
+        const endExclusive = start + gap;
+        const candidate = baseTokens.slice();
+        candidate.splice(start, 0, '(');
+        candidate.splice(endExclusive, 0, ')');
+        if (approxEqual(evaluateTokens(candidate), target)) {
+          return tokensToExpression(candidate);
+        }
+      }
     }
   }
   return null;
@@ -189,13 +140,8 @@ function solveWithoutParentheses(digits, operators, target) {
 
 function solvePuzzle({ digits, target, operators, allowReorder, allowParentheses }) {
   for (const perm of uniquePermutations(digits, allowReorder)) {
-    if (allowParentheses) {
-      const expr = solveWithParentheses(perm, operators, target);
-      if (expr) return expr;
-    } else {
-      const expr = solveWithoutParentheses(perm, operators, target);
-      if (expr) return expr;
-    }
+    const expr = solveWithSingleParentheses(perm, operators, target, allowParentheses);
+    if (expr) return expr;
   }
   return null;
 }
@@ -312,6 +258,26 @@ function validateUserSolution() {
     userFeedback.textContent = 'Parentheses currently are not allowed.';
     userFeedback.classList.remove('status--success');
     return;
+  }
+
+  if (allowParentheses) {
+    const openParens = (expression.match(/\(/g) || []).length;
+    const closeParens = (expression.match(/\)/g) || []).length;
+    if (openParens !== closeParens) {
+      userFeedback.textContent = 'Mismatched parentheses detected.';
+      userFeedback.classList.remove('status--success');
+      return;
+    }
+    if (openParens > 1) {
+      userFeedback.textContent = 'Only one pair of parentheses is allowed.';
+      userFeedback.classList.remove('status--success');
+      return;
+    }
+    if (openParens === 1 && expression.indexOf(')') < expression.indexOf('(')) {
+      userFeedback.textContent = 'Closing parenthesis appears before opening.';
+      userFeedback.classList.remove('status--success');
+      return;
+    }
   }
 
   const usedOps = expression.match(/[+*/-]/g) || [];
