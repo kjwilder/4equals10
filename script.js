@@ -351,7 +351,7 @@ function validateUserSolution() {
   }
 
   if (numberTokens.length < digits.length) {
-    applySolutionState(SOLUTION_STATES.waiting, 'Waiting for more input.');
+    applySolutionState(SOLUTION_STATES.waiting, 'Waiting for input.');
     return;
   }
 
