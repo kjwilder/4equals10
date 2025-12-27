@@ -34,6 +34,15 @@ body {
   letter-spacing: -0.02em;
 }
 
+.title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.title-link:hover {
+  text-decoration: underline;
+}
+
 .page__header p {
   margin: 8px 0 24px;
   color: var(--muted);
