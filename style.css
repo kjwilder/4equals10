@@ -89,6 +89,7 @@ body {
   background: var(--input);
   color: var(--text);
   font-size: 16px;
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
 .field input[type="number"]:focus,
@@ -235,8 +236,19 @@ button.icon-button {
   margin-top: 0;
 }
 
-.status--success {
-  color: #16a34a;
+.field input.solution-input--correct {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.field input.solution-input--incorrect {
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.field input.solution-input--waiting {
+  background: #fef9c3;
+  border-color: #fde68a;
 }
 
 @media (max-width: 540px) {
