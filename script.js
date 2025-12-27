@@ -10,8 +10,17 @@ const allowParenthesesInput = document.getElementById('allowParentheses');
 const solveIconButton = document.getElementById('solveIcon');
 const refreshDigitsButton = document.getElementById('refreshDigits');
 const userSolutionInput = document.getElementById('userSolution');
-const checkSolutionButton = document.getElementById('checkSolution');
 const userFeedback = document.getElementById('userFeedback');
+const SOLUTION_STATES = {
+  correct: 'correct',
+  incorrect: 'incorrect',
+  waiting: 'waiting',
+  neutral: 'neutral',
+};
+
+let pendingValidationToken = 0;
+let pendingValidationTimeout = null;
+let lastSolutionDigitCount = 0;
 
 function approxEqual(a, b) {
   if (a === null || b === null || Number.isNaN(a) || Number.isNaN(b)) {
@@ -147,15 +156,8 @@ function solvePuzzle({ digits, target, operators, allowReorder, allowParentheses
 }
 
 function showSolutionMessage(message, expression) {
-  const status = document.createElement('div');
-  status.className = 'status';
-  status.textContent = message;
   userFeedback.textContent = message;
-
-  if (expression) {
-    const exprEl = document.createElement('div');
-    exprEl.className = 'solution__expression';
-    exprEl.textContent = expression;
+  if (expression && userSolutionInput) {
     userSolutionInput.value = expression;
   }
 }
@@ -226,39 +228,63 @@ function handleSolve() {
   const expression = solvePuzzle({ digits, target, operators, allowReorder, allowParentheses });
 
   if (expression) {
-    showSolutionMessage('Solution found', expression);
+    showSolutionMessage('Solution found!', expression);
+    applySolutionState(SOLUTION_STATES.correct, 'Solution found!');
   } else {
     showSolutionMessage('No solution with the selected rules.');
+    applySolutionState(SOLUTION_STATES.neutral, 'No solution with the selected rules.');
   }
 }
 
 function handleNewGame() {
   if (userSolutionInput) userSolutionInput.value = '';
   if (userFeedback) userFeedback.textContent = '';
+  if (userSolutionInput) {
+    userSolutionInput.classList.remove(
+      'solution-input--correct',
+      'solution-input--incorrect',
+      'solution-input--waiting',
+    );
+  }
+  lastSolutionDigitCount = 0;
   const count = Number(digitCountInput.value);
   const digits = generateSolvableDigits(count);
   digitsInput.value = digits.join('');
 }
 
+function applySolutionState(state, message) {
+  if (!userFeedback || !userSolutionInput) return;
+  userFeedback.textContent = message || '';
+  userSolutionInput.classList.remove(
+    'solution-input--correct',
+    'solution-input--incorrect',
+    'solution-input--waiting',
+  );
+  if (state === SOLUTION_STATES.correct) {
+    userSolutionInput.classList.add('solution-input--correct');
+  } else if (state === SOLUTION_STATES.waiting) {
+    userSolutionInput.classList.add('solution-input--waiting');
+  } else if (state === SOLUTION_STATES.incorrect) {
+    userSolutionInput.classList.add('solution-input--incorrect');
+  }
+}
+
 function validateUserSolution() {
   const expression = (userSolutionInput?.value ?? '').trim();
   if (!expression) {
-    userFeedback.textContent = 'Enter an expression to check.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.neutral, '');
     return;
   }
 
   const invalidChars = /[^0-9+*\\/()\s-]/;
   if (invalidChars.test(expression)) {
-    userFeedback.textContent = 'Use only digits, operators and parentheses.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'Use only digits, operators and parentheses.');
     return;
   }
 
   const allowParentheses = allowParenthesesInput.checked;
   if (!allowParentheses && /[()]/.test(expression)) {
-    userFeedback.textContent = 'Parentheses currently are not allowed.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'Parentheses currently are not allowed.');
     return;
   }
 
@@ -266,18 +292,15 @@ function validateUserSolution() {
     const openParens = (expression.match(/\(/g) || []).length;
     const closeParens = (expression.match(/\)/g) || []).length;
     if (openParens !== closeParens) {
-      userFeedback.textContent = 'Mismatched parentheses detected.';
-      userFeedback.classList.remove('status--success');
+      applySolutionState(SOLUTION_STATES.incorrect, 'Mismatched parentheses detected.');
       return;
     }
     if (openParens > 1) {
-      userFeedback.textContent = 'Only one pair of parentheses is allowed.';
-      userFeedback.classList.remove('status--success');
+      applySolutionState(SOLUTION_STATES.incorrect, 'Only one pair of parentheses is allowed.');
       return;
     }
     if (openParens === 1 && expression.indexOf(')') < expression.indexOf('(')) {
-      userFeedback.textContent = 'Closing parenthesis appears before opening.';
-      userFeedback.classList.remove('status--success');
+      applySolutionState(SOLUTION_STATES.incorrect, 'Closing parenthesis appears before opening.');
       return;
     }
   }
@@ -285,25 +308,17 @@ function validateUserSolution() {
   const usedOps = expression.match(/[+*/-]/g) || [];
   const operators = currentOperators();
   if (!usedOps.every((op) => operators.includes(op))) {
-    userFeedback.textContent = 'You only the specified operators.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'Use only the specified operators.');
     return;
   }
 
   const numberTokens = expression.match(/\d+/g) || [];
   if (!numberTokens.every((token) => token.length === 1)) {
-    userFeedback.textContent = 'Use only the specified digits.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'Use only the specified digits.');
     return;
   }
 
   const digits = parseDigits(digitsInput.value);
-  if (numberTokens.length !== digits.length) {
-    userFeedback.textContent = 'Use each digit exactly once.';
-    userFeedback.classList.remove('status--success');
-    return;
-  }
-
   const allowReorder = allowReorderInput.checked;
   if (allowReorder) {
     const expectedCounts = digits.reduce((map, d) => {
@@ -315,53 +330,93 @@ function validateUserSolution() {
       map[d] = (map[d] || 0) + 1;
       return map;
     }, {});
+    for (const digit of Object.keys(actualCounts)) {
+      if (!expectedCounts[digit]) {
+        applySolutionState(SOLUTION_STATES.incorrect, 'Use only the specified digits.');
+        return;
+      }
+    }
     for (const [digit, count] of Object.entries(expectedCounts)) {
-      if (actualCounts[digit] !== count) {
-        userFeedback.textContent = 'Use only the specified digits.';
-        userFeedback.classList.remove('status--success');
+      if (actualCounts[digit] > count) {
+        applySolutionState(SOLUTION_STATES.incorrect, 'Use only the specified digits.');
         return;
       }
     }
   } else {
     const expected = digits.join('');
-    if (numberTokens.join('') !== expected) {
-      userFeedback.textContent = 'Digits must be used in the given order.';
-      userFeedback.classList.remove('status--success');
+    if (expected.indexOf(numberTokens.join('')) !== 0) {
+      applySolutionState(SOLUTION_STATES.incorrect, 'Digits must be used in the given order.');
       return;
     }
+  }
+
+  if (numberTokens.length < digits.length) {
+    applySolutionState(SOLUTION_STATES.waiting, 'Waiting for input.');
+    return;
+  }
+
+  if (numberTokens.length !== digits.length) {
+    applySolutionState(SOLUTION_STATES.incorrect, 'Use each digit exactly once.');
+    return;
   }
 
   let result;
   try {
     result = evaluateEquation(expression);
   } catch (error) {
-    userFeedback.textContent = 'Invalid expression. Please check your syntax.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'Invalid expression. Please check your syntax.');
     return;
   }
 
   if (result === null || Number.isNaN(result) || !Number.isFinite(result)) {
-    userFeedback.textContent = 'The expression does not evaluate to a number.';
-    userFeedback.classList.remove('status--success');
+    applySolutionState(SOLUTION_STATES.incorrect, 'The expression does not evaluate to a number.');
     return;
   }
 
   const target = Number(targetInput.value);
   if (approxEqual(result, target)) {
-    userFeedback.textContent = `Correct! ${expression} equals ${target}.`;
-    userFeedback.classList.add('status--success');
+    applySolutionState(SOLUTION_STATES.correct, 'Correct!');
   } else {
-    userFeedback.textContent = `Incorrect! ${expression} equals ${result} not ${target}.`;
-    userFeedback.classList.remove('status--success');
+    applySolutionState(
+      SOLUTION_STATES.incorrect,
+      `Incorrect! ${expression} equals ${result} not ${target}.`,
+    );
   }
+}
+
+function scheduleSolutionValidation() {
+  pendingValidationToken += 1;
+  const token = pendingValidationToken;
+  if (pendingValidationTimeout) clearTimeout(pendingValidationTimeout);
+  pendingValidationTimeout = setTimeout(() => {
+    if (token !== pendingValidationToken) return;
+    validateUserSolution();
+  }, 0);
+}
+
+function handleSolutionInput(event) {
+  const value = event?.target?.value ?? '';
+  const digitCount = (value.match(/\d/g) || []).length;
+  scheduleSolutionValidation();
+  lastSolutionDigitCount = digitCount;
+}
+
+function handleRuleChange() {
+  scheduleSolutionValidation();
 }
 
 function init() {
   digitCountInput.addEventListener('change', adjustDigitInputLength);
+  digitCountInput.addEventListener('change', handleRuleChange);
+  targetInput.addEventListener('input', handleRuleChange);
+  digitsInput.addEventListener('input', handleRuleChange);
+  allowReorderInput.addEventListener('change', handleRuleChange);
+  allowParenthesesInput.addEventListener('change', handleRuleChange);
+  operatorInputs.forEach((input) => input.addEventListener('change', handleRuleChange));
   solveIconButton.addEventListener('click', handleSolve);
   refreshDigitsButton.addEventListener('click', handleNewGame);
-  if (checkSolutionButton) {
-    checkSolutionButton.addEventListener('click', validateUserSolution);
+  if (userSolutionInput) {
+    userSolutionInput.addEventListener('input', handleSolutionInput);
   }
   handleNewGame();
 }
