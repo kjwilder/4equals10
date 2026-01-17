@@ -9,43 +9,43 @@
 <body>
   <main class="page">
     <section class="card">
-      <h1 align=center><a class="title-link" href="https://github.com/kjwilder/4equals10">4=10</a></h1>
+      <h1 class="text-center"><a class="title-link" href="https://github.com/kjwilder/4equals10">4=10</a></h1>
       <div class="layout">
         <div class="stack">
           <div class="grid">
             <label class="field">
-              <span>Number of digits</span>
-              <input id="digitCount" type="number" min="2" max="8" value="4" />
+              <span id="digitCountLabel">Number of digits</span>
+              <input id="digitCount" type="number" min="2" max="8" value="4" aria-labelledby="digitCountLabel" />
             </label>
             <label class="field">
-              <span>Target sum</span>
-              <input id="targetSum" type="number" value="10" />
+              <span id="targetSumLabel">Target sum</span>
+              <input id="targetSum" type="number" value="10" aria-labelledby="targetSumLabel" />
             </label>
             <label class="field field--checkbox">
-              <input id="allowReorder" type="checkbox" checked />
-              <span>Allow reordering</span>
+              <input id="allowReorder" type="checkbox" checked aria-describedby="reorderDesc" />
+              <span id="reorderDesc">Allow reordering</span>
             </label>
             <label class="field field--checkbox">
-              <input id="allowParentheses" type="checkbox" checked />
-              <span>Allow parentheses</span>
+              <input id="allowParentheses" type="checkbox" checked aria-describedby="parensDesc" />
+              <span id="parensDesc">Allow parentheses</span>
             </label>
           </div>
           <div class="field field--operators">
-            <span>Operators</span>
-            <div class="operators-options">
-              <label><input type="checkbox" class="operator" value="+" checked /> +</label>
-              <label><input type="checkbox" class="operator" value="-" checked /> -</label>
-              <label><input type="checkbox" class="operator" value="*" checked /> *</label>
-              <label><input type="checkbox" class="operator" value="/" checked /> /</label>
+            <span id="operatorsLabel">Operators</span>
+            <div class="operators-options" role="group" aria-labelledby="operatorsLabel">
+              <label><input type="checkbox" class="operator" value="+" checked aria-label="Addition" /> +</label>
+              <label><input type="checkbox" class="operator" value="-" checked aria-label="Subtraction" /> -</label>
+              <label><input type="checkbox" class="operator" value="*" checked aria-label="Multiplication" /> *</label>
+              <label><input type="checkbox" class="operator" value="/" checked aria-label="Division" /> /</label>
             </div>
           </div>
         </div>
         <div class="inputs-row">
           <label class="field">
-            <span>Digits</span>
+            <span id="digitsLabel">Digits</span>
             <div class="input-with-action">
-              <input id="digitsInput" type="text" value="1234" inputmode="numeric" />
-              <button id="refreshDigits" type="button" class="icon-button" aria-label="New digits">
+              <input id="digitsInput" type="text" value="1234" inputmode="numeric" aria-labelledby="digitsLabel" />
+              <button id="refreshDigits" type="button" class="icon-button" aria-label="Generate new digits">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M20 6v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                   <path d="M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -56,10 +56,10 @@
             </div>
           </label>
           <label class="field">
-            <span>Solution</span>
+            <span id="solutionLabel">Solution</span>
             <div class="input-with-action">
-              <input id="userSolution" type="text" />
-              <button id="solveIcon" type="button" class="icon-button" aria-label="Solve">
+              <input id="userSolution" type="text" aria-labelledby="solutionLabel" aria-describedby="userFeedback" />
+              <button id="solveIcon" type="button" class="icon-button" aria-label="Show solution">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M9 18h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                   <path d="M10 22h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="actions">
-        <div id="userFeedback" class="status"></div>
+        <div id="userFeedback" class="status" role="status" aria-live="polite"></div>
       </div>
     </section>
   </main>
