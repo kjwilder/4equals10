@@ -104,7 +104,7 @@ def _eval_node(node: ast.AST) -> int | float:
         return _UNARY_OPERATORS[op_type](operand)
 
     # For Python 3.7 compatibility (ast.Num is deprecated but still used)
-    if isinstance(node, ast.Num):
+    if isinstance(node, ast.Constant):
         return node.n
 
     raise UnsafeExpressionError(
